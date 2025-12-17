@@ -23,6 +23,9 @@ class PocketFenceRepository(context: Context) {
     private val _timeLimit = MutableStateFlow(TimeLimit())
     val timeLimit: StateFlow<TimeLimit> = _timeLimit.asStateFlow()
     
+    private val _childDevices = MutableStateFlow<List<ChildDevice>>(emptyList())
+    val childDevices: StateFlow<List<ChildDevice>> = _childDevices.asStateFlow()
+    
     init {
         refreshAll()
     }
@@ -31,6 +34,7 @@ class PocketFenceRepository(context: Context) {
         _connectedDevices.value = prefsManager.getConnectedDevices()
         _blockedWebsites.value = prefsManager.getBlockedWebsites()
         _timeLimit.value = prefsManager.getTimeLimit()
+        _childDevices.value = prefsManager.getChildDevices()
         _protectionStatus.value = getProtectionStatus()
     }
     
@@ -156,4 +160,30 @@ class PocketFenceRepository(context: Context) {
     fun getNotificationsEnabled(): Boolean = prefsManager.notificationsEnabled
     fun getBlockUnknownDevices(): Boolean = prefsManager.blockUnknownDevices
     fun getStrictMode(): Boolean = prefsManager.strictMode
+    
+    // Child Device Management
+    fun addChildDevice(device: ChildDevice) {
+        prefsManager.addChildDevice(device)
+        _childDevices.value = prefsManager.getChildDevices()
+    }
+    
+    fun updateChildDevice(device: ChildDevice) {
+        prefsManager.updateChildDevice(device)
+        _childDevices.value = prefsManager.getChildDevices()
+    }
+    
+    fun removeChildDevice(deviceId: String) {
+        prefsManager.removeChildDevice(deviceId)
+        _childDevices.value = prefsManager.getChildDevices()
+    }
+    
+    fun setChildDeviceWifiAccess(deviceId: String, enabled: Boolean) {
+        prefsManager.setChildDeviceWifiAccess(deviceId, enabled)
+        _childDevices.value = prefsManager.getChildDevices()
+    }
+    
+    fun setChildDeviceCellularAccess(deviceId: String, enabled: Boolean) {
+        prefsManager.setChildDeviceCellularAccess(deviceId, enabled)
+        _childDevices.value = prefsManager.getChildDevices()
+    }
 }

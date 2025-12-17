@@ -16,6 +16,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val connectedDevices: StateFlow<List<ConnectedDevice>> = repository.connectedDevices
     val blockedWebsites: StateFlow<List<BlockedWebsite>> = repository.blockedWebsites
     val timeLimit: StateFlow<TimeLimit> = repository.timeLimit
+    val childDevices: StateFlow<List<ChildDevice>> = repository.childDevices
     
     fun refreshData() {
         viewModelScope.launch {
@@ -122,4 +123,35 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun getNotificationsEnabled(): Boolean = repository.getNotificationsEnabled()
     fun getBlockUnknownDevices(): Boolean = repository.getBlockUnknownDevices()
     fun getStrictMode(): Boolean = repository.getStrictMode()
+    
+    // Child Device Management
+    fun addChildDevice(device: ChildDevice) {
+        viewModelScope.launch {
+            repository.addChildDevice(device)
+        }
+    }
+    
+    fun updateChildDevice(device: ChildDevice) {
+        viewModelScope.launch {
+            repository.updateChildDevice(device)
+        }
+    }
+    
+    fun removeChildDevice(deviceId: String) {
+        viewModelScope.launch {
+            repository.removeChildDevice(deviceId)
+        }
+    }
+    
+    fun setChildDeviceWifiAccess(deviceId: String, enabled: Boolean) {
+        viewModelScope.launch {
+            repository.setChildDeviceWifiAccess(deviceId, enabled)
+        }
+    }
+    
+    fun setChildDeviceCellularAccess(deviceId: String, enabled: Boolean) {
+        viewModelScope.launch {
+            repository.setChildDeviceCellularAccess(deviceId, enabled)
+        }
+    }
 }

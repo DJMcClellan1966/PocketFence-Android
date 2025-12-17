@@ -87,4 +87,30 @@
     <string name="delete_website_message">Remove %s from blocked list?</string>
     <string name="reset_time_title">Reset Time?</string>
     <string name="reset_time_message">Reset time usage for %s?</string>
+    
+    <!-- Child Device Management -->
+    <string name="title_child_devices">Manage Devices</string>
+    <string name="no_child_devices">No child devices registered</string>
+    <string name="add_child_device">Add Child Device</string>
+    <string name="add_child_device_hint">Tap + to add a child\'s device</string>
+    <string name="child_name">Child\'s Name</string>
+    <string name="device_id_optional">Device ID / MAC Address (Optional)</string>
+    <string name="device_id_hint">Enter MAC address or leave blank to auto-generate ID</string>
+    <string name="remove_device">Remove Device</string>
+    
+    <!-- Access Control -->
+    <string name="access_control">Access Control</string>
+    <string name="wifi_access">WiFi Access</string>
+    <string name="cellular_access">Cellular Data Access</string>
+    <string name="full_access">Full Access</string>
+    <string name="wifi_blocked">WiFi Blocked</string>
+    <string name="cellular_blocked">Cellular Blocked</string>
+    <string name="all_access_blocked">All Access Blocked</string>
+    
+    <!-- Status -->
+    <string name="status_online">Online</string>
+    <string name="status_offline">Offline</string>
+    <string name="network_type_wifi">WiFi</string>
+    <string name="network_type_cellular">Cellular</string>
+    <string name="network_type_unknown">Unknown</string>
 </resources>
