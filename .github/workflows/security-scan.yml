@@ -1,0 +1,134 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run security scan weekly on Monday at 9 AM UTC
+    - cron: '0 9 * * 1'
+
+jobs:
+  dependency-check:
+    name: Dependency Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+      
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      
+      - name: Dependency vulnerability scan
+        run: ./gradlew dependencyCheckAnalyze || true
+        continue-on-error: true
+      
+      - name: Upload dependency check report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dependency-check-report
+          path: app/build/reports/dependency-check-report.html
+          retention-days: 30
+
+  code-analysis:
+    name: Static Code Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+      
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      
+      - name: Run lint checks
+        run: ./gradlew lintDebug || true
+        continue-on-error: true
+      
+      - name: Upload lint results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lint-results
+          path: app/build/reports/lint-results-debug.html
+          retention-days: 30
+
+  security-hardening-check:
+    name: Security Configuration Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Check network security config exists
+        run: |
+          if [ ! -f "app/src/main/res/xml/network_security_config.xml" ]; then
+            echo "❌ Network security config missing"
+            exit 1
+          else
+            echo "✅ Network security config found"
+          fi
+      
+      - name: Check ProGuard rules exist
+        run: |
+          if [ ! -f "app/proguard-rules.pro" ]; then
+            echo "❌ ProGuard rules missing"
+            exit 1
+          else
+            echo "✅ ProGuard rules found"
+          fi
+      
+      - name: Verify security dependencies
+        run: |
+          echo "Checking for security dependencies..."
+          if grep -q "androidx.security:security-crypto" app/build.gradle; then
+            echo "✅ Security crypto dependency found"
+          else
+            echo "❌ Security crypto dependency missing"
+            exit 1
+          fi
+          
+          if grep -q "play-services-safetynet" app/build.gradle; then
+            echo "✅ SafetyNet dependency found"
+          else
+            echo "⚠️ SafetyNet dependency missing (optional)"
+          fi
+      
+      - name: Check manifest security settings
+        run: |
+          if grep -q "android:usesCleartextTraffic=\"false\"" app/src/main/AndroidManifest.xml; then
+            echo "✅ Cleartext traffic disabled"
+          else
+            echo "⚠️ Cleartext traffic not explicitly disabled"
+          fi
+          
+          if grep -q "android:networkSecurityConfig" app/src/main/AndroidManifest.xml; then
+            echo "✅ Network security config referenced in manifest"
+          else
+            echo "❌ Network security config not referenced in manifest"
+            exit 1
+          fi
+      
+      - name: Security check summary
+        run: |
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "✅ Security Configuration Check Passed"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"

@@ -57,3 +57,19 @@
 
 # Monetization classes
 -keep class com.pocketfence.android.monetization.** { *; }
+
+# Security classes
+-keep class com.pocketfence.android.security.** { *; }
+
+# AndroidX Security (EncryptedSharedPreferences)
+-keep class androidx.security.crypto.** { *; }
+-dontwarn androidx.security.crypto.**
+
+# SafetyNet
+-keep class com.google.android.gms.safetynet.** { *; }
+-dontwarn com.google.android.gms.safetynet.**
+
+# Security: Keep all native methods (they are declared by native code)
+-keepclasseswithmembernames class * {
+    native <methods>;
+}
