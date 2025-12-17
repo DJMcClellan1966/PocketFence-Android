@@ -1,15 +1,21 @@
 package com.pocketfence.android.repository
 
-import android.content.Context
 import com.pocketfence.android.model.*
 import com.pocketfence.android.util.PreferencesManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class PocketFenceRepository(context: Context) {
-    
-    private val prefsManager = PreferencesManager(context)
+/**
+ * Repository for managing PocketFence data.
+ * Provides a clean API for accessing and modifying app data.
+ */
+@Singleton
+class PocketFenceRepository @Inject constructor(
+    private val prefsManager: PreferencesManager
+) {
     
     private val _protectionStatus = MutableStateFlow(getProtectionStatus())
     val protectionStatus: StateFlow<ProtectionStatus> = _protectionStatus.asStateFlow()

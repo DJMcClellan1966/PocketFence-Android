@@ -1,16 +1,22 @@
 package com.pocketfence.android.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pocketfence.android.model.*
 import com.pocketfence.android.repository.PocketFenceRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class MainViewModel(application: Application) : AndroidViewModel(application) {
-    
-    private val repository = PocketFenceRepository(application)
+/**
+ * Main ViewModel for the PocketFence app.
+ * Manages UI state and business logic for all fragments.
+ */
+@HiltViewModel
+class MainViewModel @Inject constructor(
+    private val repository: PocketFenceRepository
+) : ViewModel() {
     
     val protectionStatus: StateFlow<ProtectionStatus> = repository.protectionStatus
     val connectedDevices: StateFlow<List<ConnectedDevice>> = repository.connectedDevices
@@ -20,7 +26,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     
     fun refreshData() {
         viewModelScope.launch {
-            repository.refreshAll()
+            try {
+                repository.refreshAll()
+            } catch (e: Exception) {
+                // Log error - in production, use proper logging framework
+                android.util.Log.e("MainViewModel", "Error refreshing data", e)
+            }
         }
     }
     

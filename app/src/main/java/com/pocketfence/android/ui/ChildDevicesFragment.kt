@@ -5,27 +5,30 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.pocketfence.android.R
 import com.pocketfence.android.databinding.FragmentChildDevicesBinding
 import com.pocketfence.android.model.ChildDevice
 import com.pocketfence.android.ui.adapter.ChildDeviceAdapter
 import com.pocketfence.android.viewmodel.MainViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.util.UUID
 
+/**
+ * Fragment for managing child devices.
+ */
+@AndroidEntryPoint
 class ChildDevicesFragment : Fragment() {
     
     private var _binding: FragmentChildDevicesBinding? = null
     private val binding get() = _binding!!
     
-    private lateinit var viewModel: MainViewModel
+    private val viewModel: MainViewModel by activityViewModels()
     private lateinit var adapter: ChildDeviceAdapter
     
     override fun onCreateView(
@@ -39,8 +42,6 @@ class ChildDevicesFragment : Fragment() {
     
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        
-        viewModel = ViewModelProvider(requireActivity())[MainViewModel::class.java]
         
         setupRecyclerView()
         setupFab()

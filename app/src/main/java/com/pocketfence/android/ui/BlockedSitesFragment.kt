@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.pocketfence.android.R
@@ -15,14 +15,19 @@ import com.pocketfence.android.model.WebsiteCategory
 import com.pocketfence.android.ui.adapter.BlockedWebsiteAdapter
 import com.pocketfence.android.util.NetworkUtils
 import com.pocketfence.android.viewmodel.MainViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+/**
+ * Fragment for managing blocked websites.
+ */
+@AndroidEntryPoint
 class BlockedSitesFragment : Fragment() {
     
     private var _binding: FragmentBlockedSitesBinding? = null
     private val binding get() = _binding!!
     
-    private lateinit var viewModel: MainViewModel
+    private val viewModel: MainViewModel by activityViewModels()
     private lateinit var adapter: BlockedWebsiteAdapter
     
     override fun onCreateView(
@@ -36,8 +41,6 @@ class BlockedSitesFragment : Fragment() {
     
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        
-        viewModel = ViewModelProvider(requireActivity())[MainViewModel::class.java]
         
         setupUI()
         setupRecyclerView()

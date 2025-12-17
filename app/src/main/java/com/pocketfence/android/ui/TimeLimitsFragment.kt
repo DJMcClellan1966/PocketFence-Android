@@ -7,18 +7,23 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.pocketfence.android.databinding.FragmentTimeLimitsBinding
 import com.pocketfence.android.viewmodel.MainViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+/**
+ * Fragment for managing time limits and quiet hours.
+ */
+@AndroidEntryPoint
 class TimeLimitsFragment : Fragment() {
     
     private var _binding: FragmentTimeLimitsBinding? = null
     private val binding get() = _binding!!
     
-    private lateinit var viewModel: MainViewModel
+    private val viewModel: MainViewModel by activityViewModels()
     
     private var startHour = 22
     private var startMinute = 0
@@ -36,8 +41,6 @@ class TimeLimitsFragment : Fragment() {
     
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        
-        viewModel = ViewModelProvider(requireActivity())[MainViewModel::class.java]
         
         setupUI()
         observeViewModel()
