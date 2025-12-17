@@ -9,21 +9,26 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.pocketfence.android.R
 import com.pocketfence.android.databinding.FragmentDashboardBinding
 import com.pocketfence.android.service.MonitoringService
 import com.pocketfence.android.service.VpnFilterService
 import com.pocketfence.android.viewmodel.MainViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+/**
+ * Dashboard fragment showing protection status and quick settings.
+ */
+@AndroidEntryPoint
 class DashboardFragment : Fragment() {
     
     private var _binding: FragmentDashboardBinding? = null
     private val binding get() = _binding!!
     
-    private lateinit var viewModel: MainViewModel
+    private val viewModel: MainViewModel by activityViewModels()
     
     private val vpnPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -46,8 +51,6 @@ class DashboardFragment : Fragment() {
     
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        
-        viewModel = ViewModelProvider(requireActivity())[MainViewModel::class.java]
         
         setupUI()
         observeViewModel()
@@ -96,12 +99,12 @@ class DashboardFragment : Fragment() {
     private fun updateUI(isActive: Boolean, deviceCount: Int, blockedCount: Int) {
         if (isActive) {
             binding.statusText.text = getString(R.string.status_active)
-            binding.statusText.setTextColor(resources.getColor(R.color.status_active, null))
+            binding.statusText.setTextColor(requireContext().getColor(R.color.status_active))
             binding.toggleProtectionButton.text = getString(R.string.stop_protection)
             binding.vpnStatusText.text = getString(R.string.vpn_connected)
         } else {
             binding.statusText.text = getString(R.string.status_inactive)
-            binding.statusText.setTextColor(resources.getColor(R.color.status_inactive, null))
+            binding.statusText.setTextColor(requireContext().getColor(R.color.status_inactive))
             binding.toggleProtectionButton.text = getString(R.string.start_protection)
             binding.vpnStatusText.text = getString(R.string.vpn_disconnected)
         }

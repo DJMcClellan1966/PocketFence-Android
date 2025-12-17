@@ -6,20 +6,25 @@ import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.ViewModelProvider
-import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
 import com.pocketfence.android.R
 import com.pocketfence.android.databinding.ActivityMainBinding
 import com.pocketfence.android.ui.adapter.ViewPagerAdapter
 import com.pocketfence.android.viewmodel.MainViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+/**
+ * Main activity that hosts all fragments.
+ * Uses ViewPager2 with TabLayout for navigation.
+ */
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     
     private lateinit var binding: ActivityMainBinding
-    private lateinit var viewModel: MainViewModel
+    private val viewModel: MainViewModel by viewModels()
     
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -39,8 +44,6 @@ class MainActivity : AppCompatActivity() {
         
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        
-        viewModel = ViewModelProvider(this)[MainViewModel::class.java]
         
         setSupportActionBar(binding.toolbar)
         
