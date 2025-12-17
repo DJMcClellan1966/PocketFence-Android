@@ -32,7 +32,10 @@ class BlockedWebsiteAdapter(
         
         fun bind(website: BlockedWebsite) {
             binding.websiteUrlText.text = website.url
-            binding.websiteCategoryText.text = website.category.name.replace('_', ' ')
+            // Safe category name handling with proper formatting
+            val categoryName = website.category?.name ?: "CUSTOM"
+            binding.websiteCategoryText.text = categoryName.replace('_', ' ').lowercase()
+                .replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
             
             binding.deleteButton.setOnClickListener {
                 onDeleteClick(website)

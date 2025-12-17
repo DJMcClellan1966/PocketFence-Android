@@ -55,12 +55,23 @@ class BlockedSitesFragment : Fragment() {
                 return@setOnClickListener
             }
             
+            // Enhanced URL validation
+            if (url.length < 3) {
+                Toast.makeText(requireContext(), "URL is too short", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            
             if (!NetworkUtils.isValidUrl(url)) {
                 Toast.makeText(requireContext(), R.string.error_invalid_url, Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             
             val normalizedUrl = NetworkUtils.normalizeUrl(url)
+            if (normalizedUrl.isEmpty()) {
+                Toast.makeText(requireContext(), R.string.error_invalid_url, Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            
             viewModel.addBlockedWebsite(normalizedUrl)
             binding.websiteUrlInput.text?.clear()
             Toast.makeText(requireContext(), "Added $normalizedUrl", Toast.LENGTH_SHORT).show()

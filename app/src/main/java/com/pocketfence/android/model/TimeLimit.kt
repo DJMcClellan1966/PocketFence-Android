@@ -14,7 +14,7 @@ data class TimeLimit(
                             calendar.get(java.util.Calendar.MINUTE)
         
         return if (quietHoursStart < quietHoursEnd) {
-            currentMinutes in quietHoursStart..quietHoursEnd
+            currentMinutes >= quietHoursStart && currentMinutes <= quietHoursEnd
         } else {
             // Spans midnight
             currentMinutes >= quietHoursStart || currentMinutes <= quietHoursEnd

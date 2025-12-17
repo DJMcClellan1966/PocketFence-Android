@@ -29,13 +29,25 @@ class MainActivity : AppCompatActivity() {
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
-        val allGranted = permissions.values.all { it }
-        if (!allGranted) {
-            Toast.makeText(
-                this,
-                "Some permissions were denied. App functionality may be limited.",
-                Toast.LENGTH_LONG
-            ).show()
+        val deniedPermissions = permissions.filter { !it.value }.keys
+        
+        if (deniedPermissions.isNotEmpty()) {
+            val message = when {
+                deniedPermissions.contains(Manifest.permission.ACCESS_FINE_LOCATION) -> {
+                    "Location permission is needed to detect connected devices and monitor network activity. " +
+                    "App functionality will be limited."
+                }
+                deniedPermissions.contains(Manifest.permission.POST_NOTIFICATIONS) && 
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
+                    "Notification permission is needed to keep you informed about protection status and blocked sites. " +
+                    "You can still use the app, but you won't receive notifications."
+                }
+                else -> {
+                    "Some permissions were denied. App functionality may be limited."
+                }
+            }
+            
+            Toast.makeText(this, message, Toast.LENGTH_LONG).show()
         }
     }
     
@@ -73,6 +85,7 @@ class MainActivity : AppCompatActivity() {
     private fun requestPermissions() {
         val permissionsToRequest = mutableListOf<String>()
         
+        // Android 13+ (API 33+): Request POST_NOTIFICATIONS permission
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
                 != PackageManager.PERMISSION_GRANTED
@@ -81,12 +94,35 @@ class MainActivity : AppCompatActivity() {
             }
         }
         
+        // Location permission - needed for WiFi scanning on Android 9+ (API 28+)
+        // Show rationale if user previously denied
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
             != PackageManager.PERMISSION_GRANTED
         ) {
-            permissionsToRequest.add(Manifest.permission.ACCESS_FINE_LOCATION)
+            if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
+                // Show rationale dialog
+                androidx.appcompat.app.AlertDialog.Builder(this)
+                    .setTitle("Location Permission Needed")
+                    .setMessage("PocketFence needs location permission to detect and monitor devices connected to your WiFi network. " +
+                            "This is required by Android for WiFi scanning and does not track your physical location.")
+                    .setPositiveButton("Grant") { _, _ ->
+                        permissionsToRequest.add(Manifest.permission.ACCESS_FINE_LOCATION)
+                        continuePermissionRequest(permissionsToRequest)
+                    }
+                    .setNegativeButton("Cancel") { dialog, _ ->
+                        dialog.dismiss()
+                        Toast.makeText(this, 
+                            "Location permission is required for device monitoring", 
+                            Toast.LENGTH_LONG).show()
+                    }
+                    .show()
+                return
+            } else {
+                permissionsToRequest.add(Manifest.permission.ACCESS_FINE_LOCATION)
+            }
         }
         
+        // WiFi state permissions (usually auto-granted)
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_WIFI_STATE)
             != PackageManager.PERMISSION_GRANTED
         ) {
@@ -99,6 +135,10 @@ class MainActivity : AppCompatActivity() {
             permissionsToRequest.add(Manifest.permission.CHANGE_WIFI_STATE)
         }
         
+        continuePermissionRequest(permissionsToRequest)
+    }
+    
+    private fun continuePermissionRequest(permissionsToRequest: List<String>) {
         if (permissionsToRequest.isNotEmpty()) {
             permissionLauncher.launch(permissionsToRequest.toTypedArray())
         }

@@ -78,18 +78,27 @@ class DevicesFragment : Fragment() {
         val dialog = android.app.AlertDialog.Builder(requireContext())
         val view = layoutInflater.inflate(android.R.layout.simple_list_item_1, null)
         
-        // Simple time limit dialog (can be enhanced with custom layout)
-        val hours = arrayOf("No Limit", "1 Hour", "2 Hours", "3 Hours", "4 Hours", "6 Hours", "8 Hours")
+        // Get time limit options from string resources
+        val hours = resources.getStringArray(com.pocketfence.android.R.array.time_limit_options)
         
-        dialog.setTitle("Set Time Limit")
+        dialog.setTitle(R.string.time_limit_title)
             .setItems(hours) { _, which ->
                 val hourValue = when (which) {
                     0 -> 0
-                    else -> which
+                    1 -> 1
+                    2 -> 2
+                    3 -> 3
+                    4 -> 4
+                    5 -> 6
+                    6 -> 8
+                    else -> 0
                 }
-                viewModel.setDeviceTimeLimit(macAddress, hourValue, 0)
+                // Validate hour value is reasonable (0-23 hours)
+                if (hourValue in 0..23) {
+                    viewModel.setDeviceTimeLimit(macAddress, hourValue, 0)
+                }
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton(R.string.cancel, null)
             .show()
     }
     
