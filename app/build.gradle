@@ -7,12 +7,12 @@ plugins {
 
 android {
     namespace 'com.pocketfence.android'
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         applicationId "com.pocketfence.android"
         minSdk 26
-        targetSdk 34
+        targetSdk 35
         versionCode 1
         versionName "1.0"
 
@@ -45,52 +45,53 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.core:core-ktx:1.12.0'
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.11.0'
+    // Core libraries - updated to latest stable versions
+    implementation 'androidx.core:core-ktx:1.15.0'
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'com.google.android.material:material:1.12.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     
-    // Lifecycle components
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0'
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.7.0'
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.7.0'
+    // Lifecycle components - updated to latest stable versions
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.8.7'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.8.7'
     
-    // Room database
+    // Room database - already latest
     implementation 'androidx.room:room-runtime:2.6.1'
     implementation 'androidx.room:room-ktx:2.6.1'
     kapt 'androidx.room:room-compiler:2.6.1'
     
-    // Hilt for dependency injection
-    implementation 'com.google.dagger:hilt-android:2.50'
-    kapt 'com.google.dagger:hilt-android-compiler:2.50'
+    // Hilt for dependency injection - updated to latest stable version
+    implementation 'com.google.dagger:hilt-android:2.52'
+    kapt 'com.google.dagger:hilt-android-compiler:2.52'
     
-    // Coroutines
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
+    // Coroutines - updated to latest stable version
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0'
     
-    // RecyclerView
+    // RecyclerView - already latest
     implementation 'androidx.recyclerview:recyclerview:1.3.2'
     
-    // CardView
+    // CardView - already latest
     implementation 'androidx.cardview:cardview:1.0.0'
     
-    // Work Manager for background tasks
-    implementation 'androidx.work:work-runtime-ktx:2.9.0'
+    // Work Manager for background tasks - updated to latest stable version
+    implementation 'androidx.work:work-runtime-ktx:2.10.0'
     
-    // Shared Preferences
+    // Shared Preferences - already latest
     implementation 'androidx.preference:preference-ktx:1.2.1'
     
-    // ViewPager2
+    // ViewPager2 - already latest
     implementation 'androidx.viewpager2:viewpager2:1.0.0'
     
-    // Testing
+    // Testing - updated coroutines test version
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'io.mockk:mockk:1.13.9'
-    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3'
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0'
     testImplementation 'androidx.arch.core:core-testing:2.2.0'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
-    androidTestImplementation 'com.google.dagger:hilt-android-testing:2.50'
-    kaptAndroidTest 'com.google.dagger:hilt-android-compiler:2.50'
+    androidTestImplementation 'com.google.dagger:hilt-android-testing:2.52'
+    kaptAndroidTest 'com.google.dagger:hilt-android-compiler:2.52'
 }
 
 // Allow references to generated code
