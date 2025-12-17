@@ -13,11 +13,14 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.pocketfence.android.R
 import com.pocketfence.android.databinding.FragmentDashboardBinding
+import com.pocketfence.android.monetization.AdManager
+import com.pocketfence.android.monetization.BillingManager
 import com.pocketfence.android.service.MonitoringService
 import com.pocketfence.android.service.VpnFilterService
 import com.pocketfence.android.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * Dashboard fragment showing protection status and quick settings.
@@ -29,6 +32,12 @@ class DashboardFragment : Fragment() {
     private val binding get() = _binding!!
     
     private val viewModel: MainViewModel by activityViewModels()
+    
+    @Inject
+    lateinit var adManager: AdManager
+    
+    @Inject
+    lateinit var billingManager: BillingManager
     
     private val vpnPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -54,6 +63,14 @@ class DashboardFragment : Fragment() {
         
         setupUI()
         observeViewModel()
+        setupAds()
+    }
+    
+    private fun setupAds() {
+        // Load banner ad if not premium
+        binding.adView?.let { adView ->
+            adManager.loadBannerAd(adView)
+        }
     }
     
     private fun setupUI() {
@@ -86,6 +103,28 @@ class DashboardFragment : Fragment() {
                 viewModel.setStrictMode(isChecked)
             }
         }
+        
+        // Premium button click handler
+        binding.goPremiumButton.setOnClickListener {
+            showPremiumDialog()
+        }
+        
+        // Observe premium status to hide/show premium card
+        viewLifecycleOwner.lifecycleScope.launch {
+            billingManager.premiumStatus.collect { isPremium ->
+                updatePremiumUI(isPremium)
+            }
+        }
+    }
+    
+    private fun showPremiumDialog() {
+        val dialog = PremiumDialog.newInstance()
+        dialog.show(parentFragmentManager, PremiumDialog.TAG)
+    }
+    
+    private fun updatePremiumUI(isPremium: Boolean) {
+        // Hide premium card if user has premium
+        binding.premiumCard.visibility = if (isPremium) ViewGroup.GONE else ViewGroup.VISIBLE
     }
     
     private fun observeViewModel() {

@@ -125,4 +125,23 @@
         <item>6 Hours</item>
         <item>8 Hours</item>
     </string-array>
+    
+    <!-- Monetization -->
+    <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="interstitial_ad_unit_id">ca-app-pub-3940256099942544/1033173712</string>
+    <string name="go_premium">Go Premium</string>
+    <string name="premium_title">Upgrade to Premium</string>
+    <string name="premium_subtitle">Remove ads and unlock advanced features</string>
+    <string name="premium_feature_no_ads">Remove all advertisements</string>
+    <string name="premium_feature_advanced_stats">Advanced statistics and reports</string>
+    <string name="premium_feature_multiple_profiles">Multiple user profiles</string>
+    <string name="premium_feature_priority_support">Priority customer support</string>
+    <string name="purchase_premium">Purchase Premium</string>
+    <string name="restore_purchases">Restore Purchases</string>
+    <string name="premium_active">Premium Active</string>
+    <string name="purchase_successful">Purchase successful! Thank you for supporting PocketFence.</string>
+    <string name="purchase_failed">Purchase failed. Please try again.</string>
+    <string name="purchase_canceled">Purchase canceled.</string>
+    <string name="restore_successful">Purchases restored successfully!</string>
+    <string name="restore_failed">No purchases to restore.</string>
 </resources>

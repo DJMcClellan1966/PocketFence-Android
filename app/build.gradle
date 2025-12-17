@@ -83,6 +83,12 @@ dependencies {
     // ViewPager2 - already latest
     implementation 'androidx.viewpager2:viewpager2:1.0.0'
     
+    // Google Mobile Ads SDK (AdMob) for monetization
+    implementation 'com.google.android.gms:play-services-ads:22.6.0'
+    
+    // Google Play Billing Library for in-app purchases
+    implementation 'com.android.billingclient:billing-ktx:6.1.0'
+    
     // Testing - updated coroutines test version
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'io.mockk:mockk:1.13.9'
