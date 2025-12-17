@@ -57,8 +57,8 @@ object AppModule {
     @Singleton
     fun provideAdManager(
         @ApplicationContext context: Context,
-        billingManager: BillingManager
+        monetizationRepository: MonetizationRepository
     ): AdManager {
-        return AdManager(context, billingManager)
+        return AdManager(context, monetizationRepository)
     }
 }

@@ -2,9 +2,7 @@ package com.pocketfence.android.ui
 
 import android.app.Dialog
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
@@ -41,14 +39,6 @@ class PremiumDialog : DialogFragment() {
         return dialog
     }
     
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        return binding.root
-    }
-    
     private fun setupUI() {
         binding.purchaseButton.setOnClickListener {
             launchPurchaseFlow()
@@ -81,7 +71,19 @@ class PremiumDialog : DialogFragment() {
                 }
             }
         }
+        
+        // Observe premium status for restore purchases
+        viewLifecycleOwner.lifecycleScope.launch {
+            billingManager.premiumStatus.collect { isPremium ->
+                if (isPremium && !isLoading) {
+                    // Premium was restored or purchased
+                    dismiss()
+                }
+            }
+        }
     }
+    
+    private var isLoading = false
     
     private fun launchPurchaseFlow() {
         if (!billingManager.isReady()) {
@@ -100,22 +102,21 @@ class PremiumDialog : DialogFragment() {
         showLoading(true)
         billingManager.restorePurchases()
         
-        // Give it a moment to check
+        // Check status after a brief moment for billing to query
         viewLifecycleOwner.lifecycleScope.launch {
-            kotlinx.coroutines.delay(2000)
+            kotlinx.coroutines.delay(3000) // Allow time for billing query
             showLoading(false)
             
-            if (billingManager.isPremium()) {
-                Toast.makeText(
-                    requireContext(),
-                    getString(R.string.restore_successful),
-                    Toast.LENGTH_SHORT
-                ).show()
-                dismiss()
-            } else {
+            if (!billingManager.isPremium()) {
                 Toast.makeText(
                     requireContext(),
                     getString(R.string.restore_failed),
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.restore_successful),
                     Toast.LENGTH_SHORT
                 ).show()
             }
@@ -123,6 +124,7 @@ class PremiumDialog : DialogFragment() {
     }
     
     private fun showLoading(show: Boolean) {
+        isLoading = show
         binding.progressBar.visibility = if (show) View.VISIBLE else View.GONE
         binding.purchaseButton.isEnabled = !show
         binding.restoreButton.isEnabled = !show

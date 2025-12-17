@@ -22,7 +22,7 @@ import javax.inject.Singleton
 @Singleton
 class AdManager @Inject constructor(
     private val context: Context,
-    private val billingManager: BillingManager
+    private val monetizationRepository: MonetizationRepository
 ) {
     private var interstitialAd: InterstitialAd? = null
     private var isInitialized = false
@@ -63,7 +63,7 @@ class AdManager @Inject constructor(
      */
     fun loadBannerAd(adView: AdView) {
         // Don't show ads to premium users
-        if (billingManager.isPremium()) {
+        if (monetizationRepository.getPremiumStatus()) {
             adView.visibility = ViewGroup.GONE
             Log.d(TAG, "Banner ad skipped - user has premium")
             return
@@ -87,7 +87,7 @@ class AdManager @Inject constructor(
      */
     fun loadInterstitialAd() {
         // Don't load ads for premium users
-        if (billingManager.isPremium()) {
+        if (monetizationRepository.getPremiumStatus()) {
             Log.d(TAG, "Interstitial ad loading skipped - user has premium")
             return
         }
@@ -126,7 +126,7 @@ class AdManager @Inject constructor(
      */
     fun showInterstitialAd(activity: Activity, onAdClosed: () -> Unit = {}) {
         // Don't show ads to premium users
-        if (billingManager.isPremium()) {
+        if (monetizationRepository.getPremiumStatus()) {
             Log.d(TAG, "Interstitial ad skipped - user has premium")
             onAdClosed()
             return
