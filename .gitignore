@@ -13,20 +13,57 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# APK files
 *.apk
 *.ap_
 *.aab
+
+# Built application files
 *.dex
 *.class
+
+# Generated files
 bin/
 gen/
 out/
 .gradle/
 build/
+
+# IntelliJ IDEA
 .idea/
+*.iws
+
+# Log Files
 *.log
+
+# Android Studio Navigation editor temp files
 .navigation/
+
+# Android Studio captures folder
 captures/
+
+# Output JSON from build
 output.json
+
+# Gradle wrapper jar
 !gradle-wrapper.jar
+
+# Release folder
 /app/release/
+/app/debug/
+
+# Signing files
+.signing/
+*.jks
+*.keystore
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~.nib
