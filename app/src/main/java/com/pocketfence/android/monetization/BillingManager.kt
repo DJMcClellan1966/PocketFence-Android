@@ -36,7 +36,9 @@ class BillingManager @Inject constructor(
         private const val TAG = "BillingManager"
         
         // Product IDs - These should match your Google Play Console configuration
-        const val PREMIUM_PRODUCT_ID = "premium_version"
+        const val PREMIUM_PRODUCT_ID = "premium_version" // One-time purchase (legacy)
+        const val SUBSCRIPTION_MONTHLY_ID = "premium_monthly"
+        const val SUBSCRIPTION_YEARLY_ID = "premium_yearly"
         
         // For testing, use these reserved product IDs:
         // "android.test.purchased" - always succeeds
@@ -88,16 +90,30 @@ class BillingManager @Inject constructor(
     
     /**
      * Query existing purchases to restore premium status.
+     * Checks both one-time purchases and subscriptions.
      */
     private fun queryPurchases() {
         coroutineScope.launch {
             try {
-                val params = QueryPurchasesParams.newBuilder()
+                // Query in-app purchases
+                val inAppParams = QueryPurchasesParams.newBuilder()
                     .setProductType(BillingClient.ProductType.INAPP)
                     .build()
                 
-                val purchasesResult = billingClient?.queryPurchasesAsync(params)
-                purchasesResult?.let { result ->
+                val inAppResult = billingClient?.queryPurchasesAsync(inAppParams)
+                inAppResult?.let { result ->
+                    if (result.billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+                        handlePurchases(result.purchasesList)
+                    }
+                }
+                
+                // Query subscriptions
+                val subsParams = QueryPurchasesParams.newBuilder()
+                    .setProductType(BillingClient.ProductType.SUBS)
+                    .build()
+                
+                val subsResult = billingClient?.queryPurchasesAsync(subsParams)
+                subsResult?.let { result ->
                     if (result.billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
                         handlePurchases(result.purchasesList)
                     }
@@ -109,7 +125,79 @@ class BillingManager @Inject constructor(
     }
     
     /**
-     * Launch the purchase flow for the premium product.
+     * Launch the subscription purchase flow.
+     * @param activity The activity to launch the billing flow from
+     * @param isYearly True for yearly subscription, false for monthly
+     */
+    fun launchSubscriptionFlow(activity: Activity, isYearly: Boolean) {
+        if (!isReady()) {
+            _purchaseState.value = PurchaseState.Error("Billing service not ready")
+            return
+        }
+        
+        _purchaseState.value = PurchaseState.Loading
+        
+        val productId = if (isYearly) SUBSCRIPTION_YEARLY_ID else SUBSCRIPTION_MONTHLY_ID
+        
+        coroutineScope.launch {
+            try {
+                // Query subscription product details
+                val productList = listOf(
+                    QueryProductDetailsParams.Product.newBuilder()
+                        .setProductId(productId)
+                        .setProductType(BillingClient.ProductType.SUBS)
+                        .build()
+                )
+                
+                val params = QueryProductDetailsParams.newBuilder()
+                    .setProductList(productList)
+                    .build()
+                
+                val productDetailsResult = withContext(Dispatchers.IO) {
+                    billingClient?.queryProductDetails(params)
+                }
+                
+                if (productDetailsResult?.billingResult?.responseCode == BillingClient.BillingResponseCode.OK) {
+                    val productDetails = productDetailsResult.productDetailsList?.firstOrNull()
+                    
+                    if (productDetails != null) {
+                        // Get subscription offer token
+                        val offerToken = productDetails.subscriptionOfferDetails?.firstOrNull()?.offerToken
+                        
+                        if (offerToken != null) {
+                            // Launch subscription purchase flow
+                            val productDetailsParamsList = listOf(
+                                BillingFlowParams.ProductDetailsParams.newBuilder()
+                                    .setProductDetails(productDetails)
+                                    .setOfferToken(offerToken)
+                                    .build()
+                            )
+                            
+                            val flowParams = BillingFlowParams.newBuilder()
+                                .setProductDetailsParamsList(productDetailsParamsList)
+                                .build()
+                            
+                            withContext(Dispatchers.Main) {
+                                billingClient?.launchBillingFlow(activity, flowParams)
+                            }
+                        } else {
+                            _purchaseState.value = PurchaseState.Error("Subscription offer not available")
+                        }
+                    } else {
+                        _purchaseState.value = PurchaseState.Error("Subscription not available")
+                    }
+                } else {
+                    _purchaseState.value = PurchaseState.Error("Failed to load subscription details")
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error launching subscription flow", e)
+                _purchaseState.value = PurchaseState.Error("Subscription failed: ${e.message}")
+            }
+        }
+    }
+    
+    /**
+     * Launch the purchase flow for the premium product (legacy one-time purchase).
      */
     fun launchPurchaseFlow(activity: Activity) {
         if (!isReady()) {
@@ -181,27 +269,48 @@ class BillingManager @Inject constructor(
     }
     
     private fun handlePurchases(purchases: List<Purchase>) {
+        var hasPremium = false
+        
         for (purchase in purchases) {
+            // Check for one-time premium purchase
             if (purchase.products.contains(PREMIUM_PRODUCT_ID)) {
                 if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
                     if (!purchase.isAcknowledged) {
                         acknowledgePurchase(purchase)
                     }
-                    // User has premium
-                    setPremiumStatus(true)
+                    hasPremium = true
                     _purchaseState.value = PurchaseState.Success("Premium activated!")
                     Log.d(TAG, "Premium purchase verified")
                 }
             }
+            
+            // Check for monthly subscription
+            if (purchase.products.contains(SUBSCRIPTION_MONTHLY_ID)) {
+                if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
+                    if (!purchase.isAcknowledged) {
+                        acknowledgePurchase(purchase)
+                    }
+                    hasPremium = true
+                    _purchaseState.value = PurchaseState.Success("Monthly subscription activated!")
+                    Log.d(TAG, "Monthly subscription verified")
+                }
+            }
+            
+            // Check for yearly subscription
+            if (purchase.products.contains(SUBSCRIPTION_YEARLY_ID)) {
+                if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
+                    if (!purchase.isAcknowledged) {
+                        acknowledgePurchase(purchase)
+                    }
+                    hasPremium = true
+                    _purchaseState.value = PurchaseState.Success("Yearly subscription activated!")
+                    Log.d(TAG, "Yearly subscription verified")
+                }
+            }
         }
         
-        // If no premium purchase found, ensure premium is disabled
-        if (purchases.none { 
-            it.products.contains(PREMIUM_PRODUCT_ID) && 
-            it.purchaseState == Purchase.PurchaseState.PURCHASED 
-        }) {
-            setPremiumStatus(false)
-        }
+        // Update premium status
+        setPremiumStatus(hasPremium)
     }
     
     private fun acknowledgePurchase(purchase: Purchase) {

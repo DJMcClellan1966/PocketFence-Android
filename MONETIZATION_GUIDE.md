@@ -47,15 +47,23 @@ adManager.showInterstitialAd(activity) {
 }
 ```
 
-### 2. Google Play Billing (In-App Purchases)
+### 2. Google Play Billing (Subscriptions & In-App Purchases)
+
+#### Pricing Tiers:
+- **Free Tier**: 1 child device with basic blocking features
+- **Premium Subscription**: 
+  - Monthly: $7.99/month
+  - Yearly: $59/year (38% savings)
+- **Lifetime Purchase**: $29.99 one-time payment (optional legacy option)
 
 #### Features:
-- **Premium Purchase**: One-time purchase to unlock premium features
+- **Subscription Management**: Monthly and yearly subscription options
 - **Purchase Restoration**: Users can restore purchases on new devices
 - **Premium Benefits**:
   - Ad-free experience
-  - Advanced statistics (future feature)
-  - Multiple user profiles (future feature)
+  - Unlimited child devices (Free: limited to 1)
+  - Custom block pages
+  - Advanced monitoring and reports
   - Priority support
 
 #### Configuration Files:
@@ -78,15 +86,23 @@ adManager.showInterstitialAd(activity) {
   - Manages monetization-related data
 
 #### Product IDs:
-- Premium Version: `premium_version`
-  - **Note**: This must be configured in Google Play Console
+- Monthly Subscription: `premium_monthly` - $7.99/month
+- Yearly Subscription: `premium_yearly` - $59/year
+- Legacy Lifetime: `premium_version` - $29.99 (optional)
+  - **Note**: All must be configured in Google Play Console
 
 #### Usage Example:
 ```kotlin
 @Inject
 lateinit var billingManager: BillingManager
 
-// Launch purchase flow
+// Launch monthly subscription flow
+billingManager.launchSubscriptionFlow(activity, isYearly = false)
+
+// Launch yearly subscription flow  
+billingManager.launchSubscriptionFlow(activity, isYearly = true)
+
+// Launch legacy one-time purchase (optional)
 billingManager.launchPurchaseFlow(activity)
 
 // Check premium status
@@ -155,20 +171,37 @@ billingManager.restorePurchases()
 
 ### 2. Google Play Billing Setup
 
-1. **Configure Products in Play Console**:
+1. **Configure Subscriptions in Play Console**:
    - Go to Google Play Console
    - Select your app
-   - Navigate to "Monetization" → "Products" → "In-app products"
-   - Click "Create product"
+   - Navigate to "Monetization" → "Subscriptions"
+   - Click "Create subscription"
    
-   **Product Details**:
-   - Product ID: `premium_version`
-   - Name: "PocketFence Premium"
-   - Description: "Unlock premium features and remove ads"
-   - Price: Set your desired price (e.g., $4.99)
+   **Monthly Subscription**:
+   - Product ID: `premium_monthly`
+   - Name: "PocketFence Premium Monthly"
+   - Description: "Unlimited child devices, ad-free, advanced features"
+   - Base plan: $7.99/month
+   - Benefits: Unlimited children, custom block pages, advanced monitoring
+   - Status: Active
+   
+   **Yearly Subscription**:
+   - Product ID: `premium_yearly`
+   - Name: "PocketFence Premium Yearly"
+   - Description: "Unlimited child devices, ad-free, advanced features (Save 38%)"
+   - Base plan: $59/year
+   - Benefits: Same as monthly + save 38%
    - Status: Active
 
-2. **Test Purchases**:
+2. **Optional: Configure Legacy One-Time Purchase**:
+   - Navigate to "Monetization" → "Products" → "In-app products"
+   - Product ID: `premium_version`
+   - Name: "PocketFence Lifetime Premium"
+   - Description: "One-time purchase for lifetime premium access"
+   - Price: $29.99
+   - Status: Active
+
+3. **Test Purchases**:
    - Add test accounts in Play Console under "Settings" → "License testing"
    - Use license test accounts to test purchases without charges
 

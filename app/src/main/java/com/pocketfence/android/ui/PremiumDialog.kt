@@ -40,6 +40,17 @@ class PremiumDialog : DialogFragment() {
     }
     
     private fun setupUI() {
+        // Monthly subscription button
+        binding.monthlyButton.setOnClickListener {
+            launchSubscriptionFlow(isYearly = false)
+        }
+        
+        // Yearly subscription button
+        binding.yearlyButton.setOnClickListener {
+            launchSubscriptionFlow(isYearly = true)
+        }
+        
+        // Legacy one-time purchase button
         binding.purchaseButton.setOnClickListener {
             launchPurchaseFlow()
         }
@@ -47,6 +58,19 @@ class PremiumDialog : DialogFragment() {
         binding.restoreButton.setOnClickListener {
             restorePurchases()
         }
+    }
+    
+    private fun launchSubscriptionFlow(isYearly: Boolean) {
+        if (!billingManager.isReady()) {
+            Toast.makeText(
+                requireContext(),
+                "Billing service not ready. Please try again.",
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+        
+        billingManager.launchSubscriptionFlow(requireActivity(), isYearly)
     }
     
     private fun observeBillingState() {
@@ -126,6 +150,8 @@ class PremiumDialog : DialogFragment() {
     private fun showLoading(show: Boolean) {
         isLoading = show
         binding.progressBar.visibility = if (show) View.VISIBLE else View.GONE
+        binding.monthlyButton.isEnabled = !show
+        binding.yearlyButton.isEnabled = !show
         binding.purchaseButton.isEnabled = !show
         binding.restoreButton.isEnabled = !show
     }

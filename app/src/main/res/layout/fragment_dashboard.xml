@@ -240,10 +240,19 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/premium_subtitle"
+                        android:text="@string/premium_tier"
                         android:textSize="12sp"
                         android:textColor="@color/white"
-                        android:alpha="0.9" />
+                        android:alpha="0.9"
+                        android:layout_marginBottom="4dp" />
+                    
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Starting at $7.99/month"
+                        android:textSize="10sp"
+                        android:textColor="@color/white"
+                        android:alpha="0.8" />
                 </LinearLayout>
 
                 <com.google.android.material.button.MaterialButton
