@@ -1,7 +1,12 @@
 package com.pocketfence.android.di
 
 import android.content.Context
+import com.pocketfence.android.monetization.AdManager
+import com.pocketfence.android.monetization.BillingManager
+import com.pocketfence.android.monetization.MonetizationRepository
 import com.pocketfence.android.repository.PocketFenceRepository
+import com.pocketfence.android.security.SecurePreferences
+import com.pocketfence.android.security.SecurityManager
 import com.pocketfence.android.util.PreferencesManager
 import dagger.Module
 import dagger.Provides
@@ -31,5 +36,47 @@ object AppModule {
         preferencesManager: PreferencesManager
     ): PocketFenceRepository {
         return PocketFenceRepository(preferencesManager)
+    }
+    
+    @Provides
+    @Singleton
+    fun provideMonetizationRepository(
+        @ApplicationContext context: Context
+    ): MonetizationRepository {
+        return MonetizationRepository(context)
+    }
+    
+    @Provides
+    @Singleton
+    fun provideBillingManager(
+        @ApplicationContext context: Context,
+        monetizationRepository: MonetizationRepository
+    ): BillingManager {
+        return BillingManager(context, monetizationRepository)
+    }
+    
+    @Provides
+    @Singleton
+    fun provideAdManager(
+        @ApplicationContext context: Context,
+        monetizationRepository: MonetizationRepository
+    ): AdManager {
+        return AdManager(context, monetizationRepository)
+    }
+    
+    @Provides
+    @Singleton
+    fun provideSecurityManager(
+        @ApplicationContext context: Context
+    ): SecurityManager {
+        return SecurityManager(context)
+    }
+    
+    @Provides
+    @Singleton
+    fun provideSecurePreferences(
+        @ApplicationContext context: Context
+    ): SecurePreferences {
+        return SecurePreferences(context)
     }
 }

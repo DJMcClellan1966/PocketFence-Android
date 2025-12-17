@@ -45,3 +45,31 @@
 # Androidx
 -keep class androidx.lifecycle.** { *; }
 -keep class androidx.core.app.NotificationCompat** { *; }
+
+# Google Mobile Ads (AdMob)
+-keep class com.google.android.gms.ads.** { *; }
+-keep class com.google.android.gms.common.** { *; }
+-dontwarn com.google.android.gms.ads.**
+
+# Google Play Billing
+-keep class com.android.billingclient.** { *; }
+-dontwarn com.android.billingclient.**
+
+# Monetization classes
+-keep class com.pocketfence.android.monetization.** { *; }
+
+# Security classes
+-keep class com.pocketfence.android.security.** { *; }
+
+# AndroidX Security (EncryptedSharedPreferences)
+-keep class androidx.security.crypto.** { *; }
+-dontwarn androidx.security.crypto.**
+
+# SafetyNet
+-keep class com.google.android.gms.safetynet.** { *; }
+-dontwarn com.google.android.gms.safetynet.**
+
+# Security: Keep all native methods (they are declared by native code)
+-keepclasseswithmembernames class * {
+    native <methods>;
+}

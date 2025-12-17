@@ -24,10 +24,24 @@ android {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            
+            // Security: Disable debugging in release builds
+            debuggable false
+            jniDebuggable false
+            renderscriptDebuggable false
+            
+            // Security: Enable full R8 optimization
+            crunchPngs true
         }
         debug {
             minifyEnabled false
+            debuggable true
         }
+    }
+    
+    // Security: Enable dependency verification
+    dependencyGuard {
+        configuration("releaseRuntimeClasspath")
     }
     
     compileOptions {
@@ -82,6 +96,22 @@ dependencies {
     
     // ViewPager2 - already latest
     implementation 'androidx.viewpager2:viewpager2:1.0.0'
+    
+    // Google Mobile Ads SDK (AdMob) for monetization
+    implementation 'com.google.android.gms:play-services-ads:22.6.0'
+    
+    // Google Play Billing Library for in-app purchases
+    implementation 'com.android.billingclient:billing-ktx:6.1.0'
+    
+    // Security libraries
+    // AndroidX Security for encrypted storage
+    implementation 'androidx.security:security-crypto:1.1.0-alpha06'
+    
+    // SafetyNet for integrity checks (detects rooted devices, tampered apps)
+    implementation 'com.google.android.gms:play-services-safetynet:18.1.0'
+    
+    // Certificate transparency for secure connections
+    implementation 'com.google.android.gms:play-services-base:18.5.0'
     
     // Testing - updated coroutines test version
     testImplementation 'junit:junit:4.13.2'

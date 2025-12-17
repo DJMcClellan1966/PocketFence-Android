@@ -125,4 +125,32 @@
         <item>6 Hours</item>
         <item>8 Hours</item>
     </string-array>
+    
+    <!-- Monetization -->
+    <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="interstitial_ad_unit_id">ca-app-pub-3940256099942544/1033173712</string>
+    <string name="go_premium">Go Premium</string>
+    <string name="premium_title">Upgrade to Premium</string>
+    <string name="premium_subtitle">Unlimited children + custom features</string>
+    <string name="premium_feature_no_ads">Remove all advertisements</string>
+    <string name="premium_feature_advanced_stats">Unlimited child devices</string>
+    <string name="premium_feature_multiple_profiles">Custom block pages</string>
+    <string name="premium_feature_priority_support">Advanced monitoring &amp; reports</string>
+    <string name="purchase_premium">Purchase Premium</string>
+    <string name="restore_purchases">Restore Purchases</string>
+    <string name="premium_active">Premium Active</string>
+    <string name="purchase_successful">Purchase successful! Thank you for supporting PocketFence.</string>
+    <string name="purchase_failed">Purchase failed. Please try again.</string>
+    <string name="purchase_canceled">Purchase canceled.</string>
+    <string name="restore_successful">Purchases restored successfully!</string>
+    <string name="restore_failed">No purchases to restore.</string>
+    
+    <!-- Subscriptions -->
+    <string name="choose_subscription_plan">Choose Your Plan</string>
+    <string name="subscription_monthly">Monthly - $7.99/month</string>
+    <string name="subscription_yearly">Yearly - $59/year (Save 38%)</string>
+    <string name="or_one_time_purchase">Or one-time purchase</string>
+    <string name="purchase_premium_lifetime">Lifetime Access - $29.99</string>
+    <string name="free_tier_limit">Free: 1 child device with basic blocking</string>
+    <string name="premium_tier">Premium: Unlimited children + advanced features</string>
 </resources>

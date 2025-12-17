@@ -12,9 +12,11 @@ import androidx.core.content.ContextCompat
 import com.google.android.material.tabs.TabLayoutMediator
 import com.pocketfence.android.R
 import com.pocketfence.android.databinding.ActivityMainBinding
+import com.pocketfence.android.monetization.AdManager
 import com.pocketfence.android.ui.adapter.ViewPagerAdapter
 import com.pocketfence.android.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 /**
  * Main activity that hosts all fragments.
@@ -25,6 +27,12 @@ class MainActivity : AppCompatActivity() {
     
     private lateinit var binding: ActivityMainBinding
     private val viewModel: MainViewModel by viewModels()
+    
+    @Inject
+    lateinit var adManager: AdManager
+    
+    private var tabChangeCount = 0
+    private val TAB_CHANGES_BEFORE_AD = 5 // Show ad every 5 tab changes
     
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -80,6 +88,22 @@ class MainActivity : AppCompatActivity() {
         
         // Disable swipe for now to simplify navigation
         binding.viewPager.isUserInputEnabled = true
+        
+        // Add tab selection listener to show interstitial ads occasionally
+        binding.tabLayout.addOnTabSelectedListener(object : com.google.android.material.tabs.TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: com.google.android.material.tabs.TabLayout.Tab?) {
+                tabChangeCount++
+                
+                // Show interstitial ad every N tab changes
+                if (tabChangeCount >= TAB_CHANGES_BEFORE_AD) {
+                    tabChangeCount = 0
+                    adManager.showInterstitialAd(this@MainActivity)
+                }
+            }
+            
+            override fun onTabUnselected(tab: com.google.android.material.tabs.TabLayout.Tab?) {}
+            override fun onTabReselected(tab: com.google.android.material.tabs.TabLayout.Tab?) {}
+        })
     }
     
     private fun requestPermissions() {

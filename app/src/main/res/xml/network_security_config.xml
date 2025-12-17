@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- Base configuration for all connections -->
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <!-- Trust system certificates -->
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+    
+    <!-- Debug configuration (only active in debug builds) -->
+    <debug-overrides>
+        <trust-anchors>
+            <!-- Trust user-added certificates for debugging -->
+            <certificates src="user" />
+            <certificates src="system" />
+        </trust-anchors>
+    </debug-overrides>
+    
+    <!-- Domain-specific configurations -->
+    <!-- Google services for AdMob and Play Billing -->
+    <domain-config>
+        <domain includeSubdomains="true">google.com</domain>
+        <domain includeSubdomains="true">googleapis.com</domain>
+        <domain includeSubdomains="true">gstatic.com</domain>
+        <domain includeSubdomains="true">googleadservices.com</domain>
+        <domain includeSubdomains="true">googlesyndication.com</domain>
+        <domain includeSubdomains="true">doubleclick.net</domain>
+        <pin-set>
+            <!-- Google Internet Authority G3 -->
+            <pin digest="SHA-256">f6rM0LpKaWDN2SEyz+5L6xPnLrqCqzVbLvgCL0Y4nt4=</pin>
+            <!-- Google Trust Services -->
+            <pin digest="SHA-256">hxqRlPTu1bMS/0DITB1SSu0vd4u/8l8TjPgfaAp63Gc=</pin>
+            <!-- Backup pin -->
+            <pin digest="SHA-256">++MBgDH5WGvL9Bcn5Be30cRcL0f5O+NyoXuWtQdX1aI=</pin>
+        </pin-set>
+    </domain-config>
+</network-security-config>

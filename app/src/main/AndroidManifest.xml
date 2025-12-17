@@ -20,6 +20,9 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    
+    <!-- Permissions for ads (INTERNET already declared above) -->
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID"/>
 
     <application
         android:name=".PocketFenceApplication"
@@ -31,7 +34,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.PocketFence"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:usesCleartextTraffic="false"
         tools:targetApi="31">
+        
+        <!-- AdMob App ID - Replace with your actual AdMob App ID -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-3940256099942544~3347511713"/>
         
         <!-- Main Activity -->
         <activity
