@@ -22,6 +22,12 @@ subprojects {
                 }
             }
         }
+        // Ensure Kotlin targets JVM 17 for all Kotlin-enabled projects
+        project.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+            kotlinOptions {
+                jvmTarget = '17'
+            }
+        }
     }
 }
 
