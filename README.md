@@ -174,6 +174,37 @@ This app is designed for parental control purposes. It should be used responsibl
 
 For issues, questions, or feature requests, please open an issue on GitHub.
 
+## Monetization
+
+PocketFence includes optional monetization features to support development:
+
+### Free Version
+- Full core protection features
+- Website blocking and time limits
+- Device management
+- Ad-supported (non-intrusive banner and occasional interstitial ads)
+
+### Premium Version
+- **Ad-free experience**: Remove all advertisements
+- **Advanced statistics**: Detailed analytics and reports (coming soon)
+- **Multiple profiles**: Support for multiple user profiles (coming soon)
+- **Priority support**: Get help faster
+
+### Purchasing Premium
+1. Open the app and navigate to the Dashboard
+2. Tap the "Go Premium" button on the premium card
+3. Review the premium features
+4. Complete the purchase through Google Play
+5. Ads will be automatically removed
+
+### Restore Purchases
+If you reinstall the app or switch devices:
+1. Open the Premium dialog
+2. Tap "Restore Purchases"
+3. Your premium status will be restored
+
+For detailed monetization setup and configuration, see [MONETIZATION_GUIDE.md](MONETIZATION_GUIDE.md).
+
 ## Future Enhancements
 
 - [ ] App-specific blocking
@@ -187,3 +218,4 @@ For issues, questions, or feature requests, please open an issue on GitHub.
 ---
 
 **Note**: This app requires root-level network access through VPN permissions. It does not require device rooting.
+
