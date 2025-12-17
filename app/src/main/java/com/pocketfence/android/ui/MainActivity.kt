@@ -56,8 +56,9 @@ class MainActivity : AppCompatActivity() {
             tab.text = when (position) {
                 0 -> getString(R.string.title_dashboard)
                 1 -> getString(R.string.title_devices)
-                2 -> getString(R.string.title_blocked_sites)
-                3 -> getString(R.string.title_time_limits)
+                2 -> getString(R.string.title_child_devices)
+                3 -> getString(R.string.title_blocked_sites)
+                4 -> getString(R.string.title_time_limits)
                 else -> ""
             }
         }.attach()

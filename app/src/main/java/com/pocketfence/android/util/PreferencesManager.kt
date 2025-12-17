@@ -3,7 +3,9 @@ package com.pocketfence.android.util
 import android.content.Context
 import android.content.SharedPreferences
 import com.pocketfence.android.model.BlockedWebsite
+import com.pocketfence.android.model.ChildDevice
 import com.pocketfence.android.model.ConnectedDevice
+import com.pocketfence.android.model.NetworkType
 import com.pocketfence.android.model.TimeLimit
 import com.pocketfence.android.model.WebsiteCategory
 import org.json.JSONArray
@@ -16,6 +18,7 @@ class PreferencesManager(context: Context) {
     companion object {
         private const val KEY_BLOCKED_WEBSITES = "blocked_websites"
         private const val KEY_CONNECTED_DEVICES = "connected_devices"
+        private const val KEY_CHILD_DEVICES = "child_devices"
         private const val KEY_TIME_LIMIT = "time_limit"
         private const val KEY_QUIET_HOURS_ENABLED = "quiet_hours_enabled"
         private const val KEY_QUIET_HOURS_START = "quiet_hours_start"
@@ -190,4 +193,92 @@ class PreferencesManager(context: Context) {
     var strictMode: Boolean
         get() = prefs.getBoolean(KEY_STRICT_MODE, false)
         set(value) = prefs.edit().putBoolean(KEY_STRICT_MODE, value).apply()
+    
+    // Child Devices
+    fun getChildDevices(): List<ChildDevice> {
+        val json = prefs.getString(KEY_CHILD_DEVICES, "[]") ?: "[]"
+        val list = mutableListOf<ChildDevice>()
+        try {
+            val array = JSONArray(json)
+            for (i in 0 until array.length()) {
+                val obj = array.getJSONObject(i)
+                list.add(ChildDevice(
+                    deviceId = obj.getString("deviceId"),
+                    deviceName = obj.optString("deviceName", "Unknown Device"),
+                    childName = obj.optString("childName", "Child"),
+                    macAddress = obj.optString("macAddress", ""),
+                    ipAddress = obj.optString("ipAddress", ""),
+                    isWifiEnabled = obj.optBoolean("isWifiEnabled", true),
+                    isCellularEnabled = obj.optBoolean("isCellularEnabled", true),
+                    isOnline = obj.optBoolean("isOnline", false),
+                    networkType = NetworkType.valueOf(obj.optString("networkType", "UNKNOWN")),
+                    lastSeen = obj.optLong("lastSeen", System.currentTimeMillis()),
+                    addedTime = obj.optLong("addedTime", System.currentTimeMillis())
+                ))
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return list
+    }
+    
+    fun saveChildDevices(devices: List<ChildDevice>) {
+        val array = JSONArray()
+        devices.forEach { device ->
+            val obj = JSONObject()
+            obj.put("deviceId", device.deviceId)
+            obj.put("deviceName", device.deviceName)
+            obj.put("childName", device.childName)
+            obj.put("macAddress", device.macAddress)
+            obj.put("ipAddress", device.ipAddress)
+            obj.put("isWifiEnabled", device.isWifiEnabled)
+            obj.put("isCellularEnabled", device.isCellularEnabled)
+            obj.put("isOnline", device.isOnline)
+            obj.put("networkType", device.networkType.name)
+            obj.put("lastSeen", device.lastSeen)
+            obj.put("addedTime", device.addedTime)
+            array.put(obj)
+        }
+        prefs.edit().putString(KEY_CHILD_DEVICES, array.toString()).apply()
+    }
+    
+    fun addChildDevice(device: ChildDevice) {
+        val devices = getChildDevices().toMutableList()
+        devices.add(device)
+        saveChildDevices(devices)
+    }
+    
+    fun updateChildDevice(device: ChildDevice) {
+        val devices = getChildDevices().toMutableList()
+        val index = devices.indexOfFirst { it.deviceId == device.deviceId }
+        if (index >= 0) {
+            devices[index] = device
+        } else {
+            devices.add(device)
+        }
+        saveChildDevices(devices)
+    }
+    
+    fun removeChildDevice(deviceId: String) {
+        val devices = getChildDevices().filter { it.deviceId != deviceId }
+        saveChildDevices(devices)
+    }
+    
+    fun setChildDeviceWifiAccess(deviceId: String, enabled: Boolean) {
+        val devices = getChildDevices().toMutableList()
+        val index = devices.indexOfFirst { it.deviceId == deviceId }
+        if (index >= 0) {
+            devices[index] = devices[index].copy(isWifiEnabled = enabled)
+            saveChildDevices(devices)
+        }
+    }
+    
+    fun setChildDeviceCellularAccess(deviceId: String, enabled: Boolean) {
+        val devices = getChildDevices().toMutableList()
+        val index = devices.indexOfFirst { it.deviceId == deviceId }
+        if (index >= 0) {
+            devices[index] = devices[index].copy(isCellularEnabled = enabled)
+            saveChildDevices(devices)
+        }
+    }
 }
