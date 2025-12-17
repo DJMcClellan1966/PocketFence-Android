@@ -48,8 +48,22 @@ class TimeLimitsFragment : Fragment() {
     
     private fun setupUI() {
         binding.setTimeLimitButton.setOnClickListener {
-            val hours = binding.hoursInput.text.toString().toIntOrNull() ?: 0
-            val minutes = binding.minutesInput.text.toString().toIntOrNull() ?: 0
+            val hoursText = binding.hoursInput.text.toString()
+            val minutesText = binding.minutesInput.text.toString()
+            
+            val hours = hoursText.toIntOrNull() ?: 0
+            val minutes = minutesText.toIntOrNull() ?: 0
+            
+            // Validate hours (0-23) and minutes (0-59)
+            if (hours < 0 || hours > 23) {
+                Toast.makeText(requireContext(), "Hours must be between 0 and 23", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            
+            if (minutes < 0 || minutes > 59) {
+                Toast.makeText(requireContext(), "Minutes must be between 0 and 59", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
             
             if (hours == 0 && minutes == 0) {
                 Toast.makeText(requireContext(), "Time limit set to unlimited", Toast.LENGTH_SHORT).show()

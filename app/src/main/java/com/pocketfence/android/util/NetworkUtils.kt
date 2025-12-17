@@ -11,8 +11,13 @@ import java.net.NetworkInterface
 object NetworkUtils {
     
     fun isWifiEnabled(context: Context): Boolean {
-        val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-        return wifiManager.isWifiEnabled
+        return try {
+            val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+            wifiManager.isWifiEnabled
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
     }
     
     fun getLocalIpAddress(): String? {
@@ -35,44 +40,80 @@ object NetworkUtils {
     }
     
     fun isValidUrl(url: String): Boolean {
-        if (url.isBlank()) return false
-        
-        // Remove protocol if present
-        val cleanUrl = url.lowercase()
-            .removePrefix("http://")
-            .removePrefix("https://")
-            .removePrefix("www.")
-        
-        // Basic validation
-        return cleanUrl.isNotEmpty() && 
-               (cleanUrl.contains(".") || cleanUrl == "localhost")
+        return try {
+            if (url.isBlank()) return false
+            
+            // Remove protocol if present
+            val cleanUrl = url.lowercase()
+                .removePrefix("http://")
+                .removePrefix("https://")
+                .removePrefix("www.")
+            
+            // Basic validation: must contain at least one dot or be localhost
+            // and not contain invalid characters
+            val hasValidFormat = cleanUrl.isNotEmpty() && 
+                   (cleanUrl.contains(".") || cleanUrl == "localhost")
+            
+            val hasNoInvalidChars = !cleanUrl.contains(" ") && 
+                   !cleanUrl.contains("\"") &&
+                   !cleanUrl.contains("'")
+            
+            hasValidFormat && hasNoInvalidChars
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
     }
     
     fun normalizeUrl(url: String): String {
-        return url.lowercase()
-            .removePrefix("http://")
-            .removePrefix("https://")
-            .removePrefix("www.")
-            .split("/")[0] // Get domain only
+        return try {
+            url.lowercase()
+                .removePrefix("http://")
+                .removePrefix("https://")
+                .removePrefix("www.")
+                .split("/")[0] // Get domain only
+                .trim()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            ""
+        }
     }
     
     fun urlMatches(requestedUrl: String, blockedUrl: String): Boolean {
-        val normalizedRequested = normalizeUrl(requestedUrl)
-        val normalizedBlocked = normalizeUrl(blockedUrl)
-        
-        // Check if the requested URL contains the blocked domain
-        return normalizedRequested.contains(normalizedBlocked) || 
-               normalizedRequested == normalizedBlocked ||
-               normalizedRequested.endsWith(".$normalizedBlocked")
+        return try {
+            val normalizedRequested = normalizeUrl(requestedUrl)
+            val normalizedBlocked = normalizeUrl(blockedUrl)
+            
+            if (normalizedRequested.isEmpty() || normalizedBlocked.isEmpty()) {
+                return false
+            }
+            
+            // Check if the requested URL contains the blocked domain
+            normalizedRequested.contains(normalizedBlocked) || 
+                   normalizedRequested == normalizedBlocked ||
+                   normalizedRequested.endsWith(".$normalizedBlocked")
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
     }
     
+    /**
+     * Check if WiFi hotspot is enabled.
+     * Note: This method uses reflection to access non-public Android APIs.
+     * It may not work on all devices/Android versions and could fail in future Android releases.
+     * Always has a fallback to return false on error.
+     */
     fun isHotspotEnabled(context: Context): Boolean {
-        val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
         return try {
+            val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
             val method = wifiManager.javaClass.getDeclaredMethod("isWifiApEnabled")
             method.isAccessible = true
             method.invoke(wifiManager) as Boolean
         } catch (e: Exception) {
+            // Expected to fail on some devices or Android versions
+            // This is a limitation of using non-public APIs
+            e.printStackTrace()
             false
         }
     }
@@ -115,17 +156,22 @@ object NetworkUtils {
     }
     
     fun isInternetAvailable(context: Context): Boolean {
-        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val network = connectivityManager.activeNetwork ?: return false
-            val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
-            capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-        } else {
-            @Suppress("DEPRECATION")
-            val networkInfo = connectivityManager.activeNetworkInfo
-            @Suppress("DEPRECATION")
-            networkInfo?.isConnected == true
+        return try {
+            val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                val network = connectivityManager.activeNetwork ?: return false
+                val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
+                capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            } else {
+                @Suppress("DEPRECATION")
+                val networkInfo = connectivityManager.activeNetworkInfo
+                @Suppress("DEPRECATION")
+                networkInfo?.isConnected == true
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
         }
     }
 }
